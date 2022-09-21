@@ -3,13 +3,22 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\MenuItemResource;
 use App\Models\MenuItem;
+use App\Repositories\Menu\MenuItemRepository;
 use Illuminate\Routing\Controller as BaseController;
 
 class MenuController extends BaseController
 {
+    protected $repository;
+
+    public function __construct(MenuItemRepository $menuItemRepository)
+    {
+        $this->repository = $menuItemRepository;
+    }
+
     /*
-    Requirements
+    Requirements:
     - the eloquent expressions should result in EXACTLY one SQL query no matter the nesting level or the amount of menu items.
     - it should work for infinite level of depth (children of childrens children of childrens children, ...)
     - verify your solution with `php artisan test`
@@ -17,9 +26,10 @@ class MenuController extends BaseController
 
     Hints:
     - open the `app/Http/Controllers/MenuController` file
-    - php post processing of the query results is needed
-    - imagine a maximum of a few hundred menu items
+    - eager loading cannot load deeply nested relationships
+    - a recursive function in php is needed to structure the query results
     - partial or not working answers also get graded so make sure you commit what you have
+
 
     Sample response on GET /menu:
     ```json
@@ -94,6 +104,8 @@ class MenuController extends BaseController
      */
 
     public function getMenuItems() {
-        throw new \Exception('implement in coding task 3');
+        //throw new \Exception('implement in coding task 3');
+        $menuItems = $this->repository->getMenuItems();
+        return response()->json(MenuItemResource::collection($menuItems));
     }
 }
